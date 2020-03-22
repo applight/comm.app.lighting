@@ -1,5 +1,5 @@
-const app   = require('./index.js');
-const https = require('https');
+const app  = require('./index.js');
+const http = require('http');
 
-https.createServer(app).listen(process.env.PORT);
+http.createServer(app).listen(process.env.PORT);
 
