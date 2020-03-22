@@ -1,0 +1,23 @@
+{
+  "name": "comm.app.lighting",
+  "version": "1.0.0",
+  "description": "Twilio webhooks hosted on comm.app.lighting",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applight/comm.app.lighting.git"
+  },
+  "keywords": [
+    "twilio",
+    "webhooks"
+  ],
+  "author": "Matt Vaughan - App Lighting",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/applight/comm.app.lighting/issues"
+  },
+  "homepage": "https://github.com/applight/comm.app.lighting"
+}
