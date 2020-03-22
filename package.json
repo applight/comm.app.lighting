@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/applight/comm.app.lighting/issues"
   },
-  "homepage": "https://github.com/applight/comm.app.lighting"
+  "homepage": "https://github.com/applight/comm.app.lighting",
+  "dependencies": {
+    "express": "^4.17.1",
+    "twilio": "^3.41.1"
+  }
 }
