@@ -16,13 +16,25 @@ app.post('/', (req, res) => {
 });
 
 app.post('/call-avertest', (req, res) => {
-    client.calls.create();
+    client.calls.create({
+	callerId: '+19783879792',
+	to: '+16173990190',
+	record: 'true',
+	recordStatusCallback: 'https://app.lighting/wireless/'
+	
+    });
 });
 
 
 // recordingStatusCallback target for REST API's call resource
 app.post('/transcribe-recording', (req, res) => {
-    
+    var message = client.messages.create({
+	from: '+18882001601',
+	to: '+16173345281',
+	body: req.body.transcriptionText
+    });
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    res.end( "{ 'message' : { 'sid' : ' " + message.sid + " ' }; };" );
 });
 
 // Send voice call transcript by SMS to me
