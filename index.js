@@ -66,7 +66,7 @@ app.post('/send-text-transcript', (req, res) => {
 // returns true if the person dialing in is a
 // registed app lighting client
 // isClient : String 'call endpoint' -> boolean
-function isClient( from ) {
+const isClient = ( from ) => {
     // should query a database.. while in alpha/beta
     // we'll just check the five values which should be true
     if ( from === "+16173345281" || from === "+16173351304" ||
@@ -74,9 +74,9 @@ function isClient( from ) {
 	 from === "sip:mvaughan@applight.sip.us1.twilio.com" )
 	return true;
     return false;
-}
+};
 
-function clientPTSN( from ) {
+const clientPTSN = ( from ) => {
     // should query a database.. while in alpha/beta
     // we'll just check the five values which should be true
     switch ( from.trim() ) {
@@ -93,10 +93,10 @@ function clientPTSN( from ) {
     }
     // TODO: when relevant, add e164 checks here
     return from;
-}
+};
 
 // response for an App Lighting client
-function clientResponse( caller ) {
+const clientResponse = ( caller ) => {
     const response = new VoiceResponse();
     const gather = response.gather({
 	input: 'speech dtmf',
@@ -112,10 +112,10 @@ function clientResponse( caller ) {
 	       + 'To enable or disable number proxies for your phone, press four or say proxies.' );
 
     return response;
-}
+};
 
 // response for all other callers
-function regularResponse() {
+const regularResponse = () => {
     const response = new VoiceResponse();
     const gather = response.gather({
 	input: 'speech dtmf',
@@ -129,7 +129,7 @@ function regularResponse() {
 	       + 'To leave a message, press two or say message. ');
 
     return response;
-}
+};
 
 // App Lighting's primary phone number (888) 200 - 1601
 app.post('/primary-inbound', (req, res) => {
