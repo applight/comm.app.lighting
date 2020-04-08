@@ -23,8 +23,7 @@ app.post('/call-avertest', (req, res) => {
 	callerId: '+19783879792',
 	to: '+16173990190',
 	record: 'true',
-	recordStatusCallback: 'https://app.lighting/wireless/'
-	
+	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcipt'
     });
 });
 
