@@ -25,6 +25,8 @@ app.post('/call-avertest', (req, res) => {
 	record: 'true',
 	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcipt'
     });
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    res.end( "{ 'msg' : 'complete' };" );
 });
 
 
