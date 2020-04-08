@@ -184,7 +184,7 @@ app.post('/primary-choice', (req, res) => {
 		transcribe: true
 	    });
 	    break;
-	case default:
+	default:
 	    response.say('You must choose from the available options');
 	    response.redirect({ method: 'POST' }, '/primary-inbound');
 	    break;
