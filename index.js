@@ -22,7 +22,7 @@ app.post('/call-avertest', (req, res) => {
 	callerId: '+19783879792',
 	to: '+16173990190',
 	record: 'true',
-	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcipt'
+	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcript'
     });
     res.writeHead(200, {'Content-Type': 'text/json'});
     res.end( "{ 'msg' : 'complete' };" );
@@ -70,7 +70,7 @@ app.post('/primary-inbound', (req, res) => {
 
     const caller = req.body.From;
 
-    response = null;
+    var response = undefined;
     if ( applight.isClient(caller) ) {
 	//response = clientResponse( caller );
 	// while implementing regularResponse.. all callers are routed
@@ -79,7 +79,7 @@ app.post('/primary-inbound', (req, res) => {
 	response = applight.vmScheduler.regularResponse();
     }
 
-    if ( response == null ) {
+    if ( response === undefined ) {
 	throw new Error("'null' when 'Response' type expected");
     }
 
