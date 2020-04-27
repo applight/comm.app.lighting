@@ -84,7 +84,7 @@ app.post('/send-text-transcript', (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/json'});
     res.end( "{}" );
 });
-v
+
 
 /* ***********************************************
 ** Primary App Lighting line 888 200 1601
