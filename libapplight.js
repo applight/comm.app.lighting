@@ -4,7 +4,7 @@
  */
 
 
-export.applight =  {
+exports.applight =  {
 
     // returns true if the person dialing in is a
     // registed app lighting client
