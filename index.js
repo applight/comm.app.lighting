@@ -8,13 +8,40 @@ const app               = express();
 
 const vaughan           = "+17818279675"
 
-app.post('/', (req, res) => {
-    // create a test text message
-    client.messages.create({from: '+19783879792',
-			    to: vaughan,
-			    body: 'node test'})
-	.then( message => console.log( message.sid ));
+app.post('/voice-token', (req, res) => {
+    const IDENTITY = "the_user_id";
+    const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+    const AUTH_TOKEN  = process.env.TWILIO_AUTH_TOKEN;
     
+    // set these values in your .env file
+    const TWIML_APPLICATION_SID = 'APa5002540c8175989f9f60deaf076169e';
+    const API_KEY     = 'SK1079b552a4177ff72c46ea480c2ad88e' ;
+    const API_SECRET  = 'g0ttdoEbzJSnWzpYOZcxy0TuKLpp2Yzs'   ;
+    
+    const AccessToken = Twilio.jwt.AccessToken;
+    const VoiceGrant = AccessToken.VoiceGrant;
+    
+    const accessToken = new AccessToken(ACCOUNT_SID,  API_KEY, API_SECRET );
+    accessToken.identity = IDENTITY;
+    const grant = new VoiceGrant({
+	outgoingApplicationSid: TWIML_APPLICATION_SID,
+	incomingAllow: true
+    });
+    accessToken.addGrant(grant);
+    
+    const response = new Twilio.Response();
+    
+    // Uncomment these lines for CORS support
+    response.appendHeader('Access-Control-Allow-Origin', 'https://phone.app.lighting');
+    response.appendHeader('Access-Control-Allow-Methods', 'POST');
+    response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    response.appendHeader("Content-Type", "application/json");
+    response.setBody({
+	identity: IDENTITY,
+	token: accessToken.toJwt()
+    });
+
     res.writeHead(200, {'Content-Type': 'text/xml'});
     res.end(response.toString());
 });
@@ -24,7 +51,7 @@ app.post('/call-avertest', (req, res) => {
 	callerId: '+19783879792',
 	to: '+16173990190',
 	record: 'true',
-	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcript',
+	recordStatusCallback: 'https://comm.app.lighting/send-text-transcript',
 	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan + '</Number></Dial></Response>'
     }).then( call => console.log(call.sid));
     
@@ -57,7 +84,7 @@ app.post('/send-text-transcript', (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/json'});
     res.end( "{}" );
 });
-
+v
 
 /* ***********************************************
 ** Primary App Lighting line 888 200 1601
