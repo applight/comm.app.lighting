@@ -9,7 +9,7 @@ const app               = express();
 app.post('/', (req, res) => {
     // create a test text message
     client.messages.create({from: '+19783879792',
-			    to: '+16173345281',
+			    to: '+17818279675',
 			    body: 'node test'})
 	.then( message => console.log( message.sid ));
     
@@ -18,14 +18,16 @@ app.post('/', (req, res) => {
 });
 
 app.post('/call-avertest', (req, res) => {
-    client.calls.create({
+    var call = client.calls.create({
 	callerId: '+19783879792',
 	to: '+16173990190',
 	record: 'true',
-	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcript'
-    });
+	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcript',
+	twiml: '<Response><Dial callerId="+18882001601"><Number>+17818279675</Number></Dial></Response>'
+    }).then( call => console.log(call.sid));
+    
     res.writeHead(200, {'Content-Type': 'text/json'});
-    res.end( "{ 'msg' : 'complete' };" );
+    res.end( "{ 'sid' : '" + call.sid  + "' };" );
 });
 
 
@@ -33,9 +35,10 @@ app.post('/call-avertest', (req, res) => {
 app.post('/transcribe-recording', (req, res) => {
     var message = client.messages.create({
 	from: '+18882001601',
-	to: '+16173345281',
+	to: '+17818279675',
 	body: req.body.transcriptionText
-    });
+    }).then( message => console.log( message.sid ) );
+    
     res.writeHead(200, {'Content-Type': 'text/json'});
     res.end( "{ 'message' : { 'sid' : ' " + message.sid + " ' }; };" );
 });
@@ -45,7 +48,7 @@ app.post('/transcribe-recording', (req, res) => {
 app.post('/send-text-transcript', (req, res) => {
     // creates and sends a text with transcribed results  
     client.messages.create({from:'+19783879792',
-			    to: '+16173345281',
+			    to: '+17818279675',
 			    body: req.body.results.text })
 	.then( message => console.log( message.sid ));
 
