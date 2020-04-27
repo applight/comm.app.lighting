@@ -4,12 +4,12 @@
  */
 
 
-module.exports =  {
+export.applight =  {
 
     // returns true if the person dialing in is a
     // registed app lighting client
     // isClient : String 'call endpoint' -> boolean
-    isClient : ( from ) => {
+    isClient: ( from ) => {
 	// should query a database.. while in alpha/beta
 	// we'll just check the five values which should be true
 	if ( from === "+16173345281" || from === "+16173351304" ||
@@ -18,8 +18,7 @@ module.exports =  {
 	    return true;
 	else return false;
     },
-
-    clientPTSN : ( from ) => {
+    clientPTSN: ( from ) => {
 	// should query a database.. while in alpha/beta
 	// we'll just check the five values which should be true
 	switch ( from.trim() ) {
@@ -37,44 +36,39 @@ module.exports =  {
 	// TODO: when relevant, add e164 checks here
 	return from;
     },
-
-    vmScheduler : {
-
-	// response for an App Lighting client
-	clientResponse : ( caller ) => {
-	    const response = new VoiceResponse();
-	    const gather = response.gather({
-		input: 'speech dtmf',
-		numDigits: 1,
-		timeout: 7,
-		action: '/primary-client-choice',
+    // response for an App Lighting client
+    clientResponse: ( caller ) => {
+	const response = new VoiceResponse();
+	const gather = response.gather({
+	    input: 'speech dtmf',
+	    numDigits: 1,
+	    timeout: 7,
+	    action: '/primary-client-choice',
 		method: 'POST'
-	    });
-	    gather.say('Welcome to App Lighting appointments and voicemail. '
-		       + 'To hear your messages, press one or say messages. '
-		       + 'To list your upcoming appointments, press two or say appointments. '
-		       + 'To begin or join a conference, press three or say conference. '
+	});
+	gather.say('Welcome to App Lighting appointments and voicemail. '
+		   + 'To hear your messages, press one or say messages. '
+		   + 'To list your upcoming appointments, press two or say appointments. '
+		   + 'To begin or join a conference, press three or say conference. '
 		       + 'To enable or disable number proxies for your phone, press four or say proxies.' );
-	    
-	    return response;
-	},
-
-	// response for all other callers
-	regularResponse : () => {
-	    const response = new VoiceResponse();
-	    const gather = response.gather({
-		input: 'speech dtmf',
-		numDigits: 1,
+	
+	return response;
+    },
+    // response for all other callers
+    regularResponse: () => {
+	const response = new VoiceResponse();
+	const gather = response.gather({
+	    input: 'speech dtmf',
+	    numDigits: 1,
 		timeout: 7,
-		action: '/primary-choice',
-		method: 'POST'
+	    action: '/primary-choice',
+	    method: 'POST'
 	    });
-	    gather.say('You have reached App Lighting. '
+	gather.say('You have reached App Lighting. '
 		       + 'To schedule an appointment, press one or say appointment. '
-		       + 'To leave a message, press two or say message. ');
-	    
-	    return response;
-	}
+		   + 'To leave a message, press two or say message. ');
+	
+	return response;
     }
 };
 

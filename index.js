@@ -6,10 +6,12 @@ const VoiceResponse     = require('twilio').twiml.VoiceResponse;
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const app               = express();
 
+const vaughan           = "+17818279675"
+
 app.post('/', (req, res) => {
     // create a test text message
     client.messages.create({from: '+19783879792',
-			    to: '+17818279675',
+			    to: vaughan,
 			    body: 'node test'})
 	.then( message => console.log( message.sid ));
     
@@ -23,7 +25,7 @@ app.post('/call-avertest', (req, res) => {
 	to: '+16173990190',
 	record: 'true',
 	recordStatusCallback: 'https://comm.app.lighting/wireless/send-text-transcript',
-	twiml: '<Response><Dial callerId="+18882001601"><Number>+17818279675</Number></Dial></Response>'
+	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan + '</Number></Dial></Response>'
     }).then( call => console.log(call.sid));
     
     res.writeHead(200, {'Content-Type': 'text/json'});
@@ -35,7 +37,7 @@ app.post('/call-avertest', (req, res) => {
 app.post('/transcribe-recording', (req, res) => {
     var message = client.messages.create({
 	from: '+18882001601',
-	to: '+17818279675',
+	to: vaughan,
 	body: req.body.transcriptionText
     }).then( message => console.log( message.sid ) );
     
@@ -48,7 +50,7 @@ app.post('/transcribe-recording', (req, res) => {
 app.post('/send-text-transcript', (req, res) => {
     // creates and sends a text with transcribed results  
     client.messages.create({from:'+19783879792',
-			    to: '+17818279675',
+			    to: vaughan,
 			    body: req.body.results.text })
 	.then( message => console.log( message.sid ));
 
@@ -75,7 +77,7 @@ app.post('/primary-inbound', (req, res) => {
 
     var response = undefined;
     if ( applight.isClient(caller) ) {
-	//response = clientResponse( caller );
+	// response = clientResponse( caller );
 	// while implementing regularResponse.. all callers are routed
 	response = applight.vmScheduler.regularResponse();
     } else {
