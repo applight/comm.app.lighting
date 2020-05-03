@@ -10,18 +10,20 @@ const vaughan           = "+17818279675"
 
 app.post('/voice-token', (req, res) => {
     const IDENTITY = "the_user_id";
+
+    // envirnment vars for REST CLIENT
     const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
     const AUTH_TOKEN  = process.env.TWILIO_AUTH_TOKEN;
-    
-    // set these values in your .env file
-    const TWIML_APPLICATION_SID = 'APa5002540c8175989f9f60deaf076169e';
-    const API_KEY     = 'SK1079b552a4177ff72c46ea480c2ad88e' ;
-    const API_SECRET  = 'g0ttdoEbzJSnWzpYOZcxy0TuKLpp2Yzs'   ;
+
+    // envirnment vars for accessToken
+    const TWIML_APPLICATION_SID = process.env.TWILIO_APPLICATION_SID;
+    const API_KEY     = process.env.TWILIO_API_KEY;
+    const API_SECRET  = process.env.TWILIO.API_SECRET;
     
     const AccessToken = Twilio.jwt.AccessToken;
     const VoiceGrant = AccessToken.VoiceGrant;
     
-    const accessToken = new AccessToken(ACCOUNT_SID,  API_KEY, API_SECRET );
+    const accessToken = new AccessToken(ACCOUNT_SID,  API_KEY, API_SECRET);
     accessToken.identity = IDENTITY;
     const grant = new VoiceGrant({
 	outgoingApplicationSid: TWIML_APPLICATION_SID,
