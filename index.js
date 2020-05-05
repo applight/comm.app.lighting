@@ -19,8 +19,11 @@ app.get('/voice-token', (request, response) => {
 	applicationSid: process.env.TWILIO_TWIML_APP_SID}));
     
     const token = capability.toJwt();
-    
-  // Include token in a JSON response
+
+    response.appendHeader('Access-Control-Allow-Origin', '*');
+    response.appendHeader('Access-Control-Allow-Methods', 'GET');
+    response.type('text/xml');
+    // Include token in a JSON response
     response.send({
 	token: token
     });
@@ -31,7 +34,7 @@ app.post('/voice', (request, response) => {
     voiceResponse.dial({
 	callerId: '+18882001601',
     }, request.body.number);
-    
+
     response.type('text/xml');
     response.send(voiceResponse.toString());
 });
