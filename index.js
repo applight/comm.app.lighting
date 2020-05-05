@@ -7,25 +7,35 @@ const MessagingResponse = twilio.twiml.MessagingResponse;
 const ClientCapability  = twilio.jwt.ClientCapability;
 const app               = express();
 
-const vaughan           = "+17818279675"
+const vaughan           = '+17818279675'
 
 app.get('/voice-token', (request, response) => {
+    const identity = 'the_user_id';
+    
     const capability = new ClientCapability({
-	accountSid: process.env.TWILIO_ACCOUNT_SID,
-	authToken: process.env.TWILIO_AUTH_TOKEN
+	'accountSid': process.env.TWILIO_ACCOUNT_SID,
+	'authToken': process.env.TWILIO_AUTH_TOKEN
     });
-    
-    capability.addScope(new ClientCapability.OutgoingClientScope({
-	applicationSid: process.env.TWILIO_TWIML_APP_SID}));
-    
-    const token = capability.toJwt();
 
-    response.appendHeader('Access-Control-Allow-Origin', '*');
-    response.appendHeader('Access-Control-Allow-Methods', 'GET');
-    response.type('text/xml');
+    capability.addScope(new ClientCapability.IncomingClientScope(identity));   
+    capability.addScope(new ClientCapability.OutgoingClientScope({
+	'applicationSid': process.env.TWILIO_TWIML_APP_SID,
+	'clientName': identity
+    }) );
+    
+    let headers = {
+	"Access-Control-Allow-Origin": "https://phone.app.lighting",
+	"Access-Control-Allow-Methods": "GET",
+	"Content-Type": "application/json"
+    };
+    // Set headers in response
+    response.setHeaders(headers);
+    response.setStatusCode(200);
+
     // Include token in a JSON response
     response.send({
-	token: token
+	'identity': identity,
+	'token': capability.toJwt()
     });
 });
 
