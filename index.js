@@ -146,12 +146,12 @@ app.post('/primary-inbound', (req, res) => {
     const caller = req.body.From;
 
     var response = undefined;
-    if ( applight.isClient(caller) ) {
+    if ( isClient(caller) ) {
 	// response = clientResponse( caller );
 	// while implementing regularResponse.. all callers are routed
-	response = applight.vmScheduler.regularResponse();
+	response = applight.regularResponse();
     } else {
-	response = applight.vmScheduler.regularResponse();
+	response = applight.regularResponse();
     }
 
     if ( response === undefined ) {
@@ -159,7 +159,7 @@ app.post('/primary-inbound', (req, res) => {
     }
 
     res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.end(response.toString());
+    res.send(response.toString());
 });
 
 
