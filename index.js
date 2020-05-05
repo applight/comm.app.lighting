@@ -9,7 +9,7 @@ const app               = express();
 
 const vaughan           = "+17818279675"
 
-app.get('/token-voice', (request, response) => {
+app.get('/voice-token', (request, response) => {
     const capability = new ClientCapability({
 	accountSid: process.env.TWILIO_ACCOUNT_SID,
 	authToken: process.env.TWILIO_AUTH_TOKEN
