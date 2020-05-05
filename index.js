@@ -1,13 +1,42 @@
 const express  = require('express');
 const applight = require('./libapplight.js');
+const twilio   = require('twilio');
 const client   = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-const VoiceResponse     = require('twilio').twiml.VoiceResponse;
-const MessagingResponse = require('twilio').twiml.MessagingResponse;
+const VoiceResponse     = twilio.twiml.VoiceResponse;
+const MessagingResponse = twilio.twiml.MessagingResponse;
+const ClientCapability  = twilio.jwt.ClientCapability;
 const app               = express();
 
 const vaughan           = "+17818279675"
 
+app.get('/token-voice', (request, response) => {
+    const capability = new ClientCapability({
+	accountSid: process.env.TWILIO_ACCOUNT_SID,
+	authToken: process.env.TWILIO_AUTH_TOKEN
+    });
+    
+    capability.addScope(new ClientCapability.OutgoingClientScope({
+	applicationSid: process.env.TWILIO_TWIML_APP_SID}));
+    
+    const token = capability.toJwt();
+    
+  // Include token in a JSON response
+    response.send({
+	token: token
+    });
+});
+
+app.post('/voice', (request, response) => {
+    const voiceResponse = new VoiceResponse();
+    voiceResponse.dial({
+	callerId: '+18882001601',
+    }, request.body.number);
+    
+    response.type('text/xml');
+    response.send(voiceResponse.toString());
+});
+
+/*
 app.post('/voice-token', (req, res) => {
     const IDENTITY = "the_user_id";
 
@@ -34,7 +63,7 @@ app.post('/voice-token', (req, res) => {
     const response = new Twilio.Response();
     
     // Uncomment these lines for CORS support
-    response.appendHeader('Access-Control-Allow-Origin', 'https://phone.app.lighting');
+    response.appendHeader('Access-Control-Allow-Origin', '*');
     response.appendHeader('Access-Control-Allow-Methods', 'GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
     response.appendHeader("Content-Type", "application/json");
@@ -45,6 +74,7 @@ app.post('/voice-token', (req, res) => {
 
     res.end(response.toString());
 });
+*/
 
 app.post('/call-avertest', (req, res) => {
     var call = client.calls.create({
