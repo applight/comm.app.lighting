@@ -35,9 +35,8 @@ app.post('/voice-token', (req, res) => {
     
     // Uncomment these lines for CORS support
     response.appendHeader('Access-Control-Allow-Origin', 'https://phone.app.lighting');
-    response.appendHeader('Access-Control-Allow-Methods', 'POST');
+    response.appendHeader('Access-Control-Allow-Methods', 'GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
     response.appendHeader("Content-Type", "application/json");
     response.setBody({
 	identity: IDENTITY,
@@ -64,7 +63,7 @@ app.post('/call-avertest', (req, res) => {
 // recordingStatusCallback target for REST API's call resource
 app.post('/transcribe-recording', (req, res) => {
     var message = client.messages.create({
-	from: '+18882001601',
+	from: '+19783879792',
 	to: vaughan,
 	body: req.body.transcriptionText
     }).then( message => console.log( message.sid ) );
