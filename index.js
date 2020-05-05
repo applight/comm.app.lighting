@@ -44,7 +44,6 @@ app.post('/voice-token', (req, res) => {
 	token: accessToken.toJwt()
     });
 
-    res.writeHead(200, {'Content-Type': 'text/xml'});
     res.end(response.toString());
 });
 
