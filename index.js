@@ -9,8 +9,6 @@ const app               = express();
 
 const vaughan           = '+17818279675'
 
-
-
 // returns true if the person dialing in is a
 // registed app lighting client
 // isClient : String 'call endpoint' -> boolean
@@ -36,8 +34,7 @@ function clientPTSN( from ) {
 	break;
     case "sip:mvaughan@applight.sip.us1.twilio.com":
 	return "+19783879792";
-	break;
-	
+	break;	
     }
     // TODO: when relevant, add e164 checks here
     return from;
@@ -95,17 +92,22 @@ app.get('/voice-token', (request, response) => {
 	'clientName': identity
     }) );
     
-    let headers = {
-	"Access-Control-Allow-Origin": "https://phone.app.lighting",
-	"Access-Control-Allow-Methods": "GET",
-	"Content-Type": "application/json"
-    };
     // Set headers in response
-    response.setHeaders(headers);
-    response.setStatusCode(200);
+    res.setStatusCode(200);
+    res.appendHeader('Access-Control-Allow-Origin',
+		     'https://phone.app.lighting');
+    res.appendHeader('Access-Control-Allow-Methods', 'GET');
+    res.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.appendHeader("Content-Type", "application/json");
+    res.setBody({
+	'identity': identity,
+	'token': accessToken.toJwt()
+    });
+
+    res.end(response.toString());
 
     // Include token in a JSON response
-    response.send({
+    resp.send({
 	'identity': identity,
 	'token': capability.toJwt()
     });
