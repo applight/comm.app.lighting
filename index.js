@@ -164,7 +164,7 @@ app.post('/voice-token', (req, res) => {
 */
 
 // when one of my numbers is dialed from an outside line
-app.post('/dial-me' (req, res) => {
+app.post('/dial-me', (req, res) => {
     const response = new VoiceResponse();
     response.dial({ callerId: req.body.From }, vaughan );
 
