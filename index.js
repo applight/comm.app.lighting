@@ -123,45 +123,6 @@ app.post('/voice', (request, response) => {
     response.send(voiceResponse.toString());
 });
 
-/*
-app.post('/voice-token', (req, res) => {
-    const IDENTITY = "the_user_id";
-
-    // envirnment vars for REST CLIENT
-    const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
-    const AUTH_TOKEN  = process.env.TWILIO_AUTH_TOKEN;
-
-    // envirnment vars for accessToken
-    const TWIML_APPLICATION_SID = process.env.TWILIO_APPLICATION_SID;
-    const API_KEY     = process.env.TWILIO_API_KEY;
-    const API_SECRET  = process.env.TWILIO.API_SECRET;
-    
-    const AccessToken = Twilio.jwt.AccessToken;
-    const VoiceGrant = AccessToken.VoiceGrant;
-    
-    const accessToken = new AccessToken(ACCOUNT_SID,  API_KEY, API_SECRET);
-    accessToken.identity = IDENTITY;
-    const grant = new VoiceGrant({
-	outgoingApplicationSid: TWIML_APPLICATION_SID,
-	incomingAllow: true
-    });
-    accessToken.addGrant(grant);
-    
-    const response = new Twilio.Response();
-    
-    // Uncomment these lines for CORS support
-    response.appendHeader('Access-Control-Allow-Origin', '*');
-    response.appendHeader('Access-Control-Allow-Methods', 'GET');
-    response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-    response.appendHeader("Content-Type", "application/json");
-    response.setBody({
-	identity: IDENTITY,
-	token: accessToken.toJwt()
-    });
-
-    res.end(response.toString());
-});
-*/
 
 // when one of my numbers is dialed from an outside line
 app.post('/dial-me', (req, res) => {
