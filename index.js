@@ -1,5 +1,4 @@
 const express  = require('express');
-//const applight = require('./libapplight.js');
 const twilio   = require('twilio');
 const client   = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const VoiceResponse     = twilio.twiml.VoiceResponse;
@@ -7,7 +6,7 @@ const MessagingResponse = twilio.twiml.MessagingResponse;
 const ClientCapability  = twilio.jwt.ClientCapability;
 const app               = express();
 
-const vaughan           = '+17818279675'
+const vaughan           = '+17818081276'
 
 // returns true if the person dialing in is a
 // registed app lighting client
@@ -77,7 +76,7 @@ function regularResponse() {
     return response;
 }
 
-
+// provide a voice capability token to requester
 app.get('/voice-token', (request, response) => {
     const identity = 'the_user_id';
     
@@ -113,6 +112,7 @@ app.get('/voice-token', (request, response) => {
     });
 });
 
+// voice response for js webapp dialer
 app.post('/voice', (request, response) => {
     const voiceResponse = new VoiceResponse();
     voiceResponse.dial({
@@ -163,10 +163,21 @@ app.post('/voice-token', (req, res) => {
 });
 */
 
+// when one of my numbers is dialed from an outside line
+app.post('/dial-me' (req, res) => {
+    const response = new VoiceResponse();
+    response.dial({ callerId: req.body.From }, vaughan );
+
+    res.writeHead( 200, {'Content-Type': 'text/xml'} );
+    res.end( response.toString() );
+});
+
+// call for my drug test info
 app.post('/call-avertest', (req, res) => {
     var call = client.calls.create({
 	callerId: '+19783879792',
 	to: '+16173990190',
+	sendDigits: '',
 	record: 'true',
 	recordStatusCallback: 'https://comm.app.lighting/send-text-transcript',
 	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan
@@ -234,7 +245,7 @@ app.post('/primary-inbound', (req, res) => {
     }
 
     res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.send(response.toString());
+    res.end(response.toString());
 });
 
 
