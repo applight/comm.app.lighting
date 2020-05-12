@@ -22,6 +22,8 @@
   "homepage": "https://app.lighting",
   "dependencies": {
     "express": "^4.17.1",
-    "twilio": "^3.41.1"
-  }
+    "node": "^14.2.0",
+    "twilio": "^3.43.0"
+  },
+  "devDependencies": {}
 }
