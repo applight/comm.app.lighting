@@ -92,21 +92,15 @@ app.get('/voice-token', (request, response) => {
     }) );
     
     // Set headers in response
-    res.setStatusCode(200);
+    // res.setStatusCode(200);
     res.appendHeader('Access-Control-Allow-Origin',
-		     'https://phone.app.lighting');
+		     '*');
     res.appendHeader('Access-Control-Allow-Methods', 'GET');
     res.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.appendHeader("Content-Type", "application/json");
-    res.setBody({
-	'identity': identity,
-	'token': accessToken.toJwt()
-    });
-
-    res.end(response.toString());
-
+    res.appendHeader("Content-Type", "text/json");
+    
     // Include token in a JSON response
-    resp.send({
+    res.send({
 	'identity': identity,
 	'token': capability.toJwt()
     });
@@ -119,7 +113,7 @@ app.post('/voice', (request, response) => {
 	callerId: '+18882001601',
     }, request.body.number);
 
-    response.type('text/xml');
+    res.writeHead( 200, {'Content-Type': 'text/xml'} );
     response.send(voiceResponse.toString());
 });
 
@@ -133,21 +127,24 @@ app.post('/dial-me', (req, res) => {
     res.end( response.toString() );
 });
 
-// call for my drug test info
-app.post('/call-avertest', (req, res) => {
+function f_avertest(req, res) {
     var call = client.calls.create({
-	callerId: '+19783879792',
+	from: '+19783879792',
 	to: '+16173990190',
-	sendDigits: '',
+	sendDigits: 'ww1w4615998#w1',
 	record: 'true',
-	recordStatusCallback: 'https://comm.app.lighting/send-text-transcript',
+	recordStatusCallback: '/send-text-transcript',
 	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan
 	    + '</Number></Dial></Response>'
     }).then( call => console.log(call.sid));
     
     res.writeHead(200, {'Content-Type': 'text/json'});
     res.end( "{ 'sid' : '" + call.sid  + "' };" );
-});
+}
+
+// call for my drug test info
+app.post('/call-avertest', f_avertest );
+app.get('/call-avertest', f_avertest );
 
 
 // recordingStatusCallback target for REST API's call resource
@@ -253,3 +250,9 @@ app.post('/primary-choice', (req, res) => {
     res.end(response.toString());
     
 });
+
+if ( process.env.NODE_DEBUG ) {
+    app.listen( 9080, () => {
+	console.log('Listening on 127.0.0.1:9080');
+    });
+}
