@@ -7,6 +7,7 @@ const ClientCapability  = twilio.jwt.ClientCapability;
 const app               = express();
 
 const vaughan           = '+17818081276'
+const DEBUG = (typeof(process.env.NODE_DEBUG) != 'undefined' && process.env.NODE_DEBUG == 1) ? true : false;
 
 // returns true if the person dialing in is a
 // registed app lighting client
@@ -39,6 +40,113 @@ function clientPTSN( from ) {
     return from;
 }
 
+// provide a voice capability token to requester
+app.get('/voice-token', (request, response) => {
+    const identity = 'the_user_id';
+    
+    const capability = new ClientCapability({
+	'accountSid': process.env.TWILIO_ACCOUNT_SID,
+	'authToken': process.env.TWILIO_AUTH_TOKEN
+    });
+
+    capability.addScope(new ClientCapability.IncomingClientScope(identity));   
+    capability.addScope(new ClientCapability.OutgoingClientScope({
+	'applicationSid': process.env.TWILIO_TWIML_APP_SID,
+	'clientName': identity
+    }) );
+    
+    // Set headers in response
+    // res.setStatusCode(200);
+    res.appendHeader('Access-Control-Allow-Origin','https://app.lighting');
+    res.appendHeader('Access-Control-Allow-Methods', 'GET');
+    res.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.appendHeader("Content-Type", "text/json");
+    
+    // Include token in a JSON response
+    res.send({
+	'identity': identity,
+	'token': capability.toJwt()
+    });
+});
+
+// voice response for js webapp dialer
+app.post('/voice', (req, res) => {
+    const voiceResponse = new VoiceResponse();
+    voiceResponse.dial({
+	callerId: '+18882001601',
+    }, request.body.To );
+
+    res.writeHead( 200, {'Content-Type': 'text/xml'} );
+    res.send(voiceResponse.toString());
+});
+
+
+// when one of my numbers is dialed from an outside line
+app.post('/dial-me', (req, res) => {
+    const response = new VoiceResponse();
+    response.dial({ callerId: req.body.From }, vaughan );
+    
+    res.writeHead( 200, {'Content-Type': 'text/xml'} );
+    res.end( response.toString() );
+});
+
+
+function f_avertest(req, res) {
+    var call = client.calls.create({
+	from: '+19783879792',
+	to: '+16173990190',
+	sendDigits: 'ww1w4615998#w1',
+	record: 'true',
+	recordStatusCallback: '/send-text-transcript',
+	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan
+	    + '</Number></Dial></Response>'
+    }).then( call => console.log(call.sid));
+    
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    res.end( "{ 'sid' : '" + call.sid  + "' };" );
+}
+
+// call for my drug test info
+app.post('/call-avertest', f_avertest );
+app.get('/call-avertest', f_avertest );
+
+
+// recordingStatusCallback target for REST API's call resource
+app.post('/transcribe-recording', (req, res) => {
+    var message = client.messages.create({
+	from: '+19783879792',
+	to: vaughan,
+	body: req.body.transcriptionText
+    }).then( message => console.log( message.sid ) );
+    
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    res.end( "{ 'message' : { 'sid' : ' " + message.sid + " ' }; };" );
+});
+
+// Send voice call transcript by SMS to me
+// Used by plugin on twiml <Record> elements
+app.post('/send-text-transcript', (req, res) => {
+    if ( DEBUG ) console.log("req.body.results:" + req.body.results.toString());
+    // creates and sends a text with transcribed results  
+    client.messages.create({from:'+19783879792',
+			    to: vaughan,
+			    body: req.body.results.text })
+	.then( message => console.log( message.sid ));
+
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    res.end( "{}" );
+});
+
+
+/* ***********************************************
+** Primary App Lighting line 888 200 1601
+**
+** Should provide voicemail, appointment scheduling,
+** and additional features for clients (me, d, whoev)
+** who call in (like listening to voicemail, checking
+** appointments, special dialing features
+**
+** *********************************************** */
 // response for an App Lighting client
 function clientResponse( caller ) {
     const response = new VoiceResponse();
@@ -76,120 +184,12 @@ function regularResponse() {
     return response;
 }
 
-// provide a voice capability token to requester
-app.get('/voice-token', (request, response) => {
-    const identity = 'the_user_id';
-    
-    const capability = new ClientCapability({
-	'accountSid': process.env.TWILIO_ACCOUNT_SID,
-	'authToken': process.env.TWILIO_AUTH_TOKEN
-    });
-
-    capability.addScope(new ClientCapability.IncomingClientScope(identity));   
-    capability.addScope(new ClientCapability.OutgoingClientScope({
-	'applicationSid': process.env.TWILIO_TWIML_APP_SID,
-	'clientName': identity
-    }) );
-    
-    // Set headers in response
-    // res.setStatusCode(200);
-    res.appendHeader('Access-Control-Allow-Origin',
-		     '*');
-    res.appendHeader('Access-Control-Allow-Methods', 'GET');
-    res.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.appendHeader("Content-Type", "text/json");
-    
-    // Include token in a JSON response
-    res.send({
-	'identity': identity,
-	'token': capability.toJwt()
-    });
-});
-
-// voice response for js webapp dialer
-app.post('/voice', (request, response) => {
-    const voiceResponse = new VoiceResponse();
-    voiceResponse.dial({
-	callerId: '+18882001601',
-    }, request.body.number);
-
-    res.writeHead( 200, {'Content-Type': 'text/xml'} );
-    response.send(voiceResponse.toString());
-});
-
-
-// when one of my numbers is dialed from an outside line
-app.post('/dial-me', (req, res) => {
-    const response = new VoiceResponse();
-    response.dial({ callerId: req.body.From }, vaughan );
-
-    res.writeHead( 200, {'Content-Type': 'text/xml'} );
-    res.end( response.toString() );
-});
-
-function f_avertest(req, res) {
-    var call = client.calls.create({
-	from: '+19783879792',
-	to: '+16173990190',
-	sendDigits: 'ww1w4615998#w1',
-	record: 'true',
-	recordStatusCallback: '/send-text-transcript',
-	twiml: '<Response><Dial callerId="+18882001601"><Number>' + vaughan
-	    + '</Number></Dial></Response>'
-    }).then( call => console.log(call.sid));
-    
-    res.writeHead(200, {'Content-Type': 'text/json'});
-    res.end( "{ 'sid' : '" + call.sid  + "' };" );
-}
-
-// call for my drug test info
-app.post('/call-avertest', f_avertest );
-app.get('/call-avertest', f_avertest );
-
-
-// recordingStatusCallback target for REST API's call resource
-app.post('/transcribe-recording', (req, res) => {
-    var message = client.messages.create({
-	from: '+19783879792',
-	to: vaughan,
-	body: req.body.transcriptionText
-    }).then( message => console.log( message.sid ) );
-    
-    res.writeHead(200, {'Content-Type': 'text/json'});
-    res.end( "{ 'message' : { 'sid' : ' " + message.sid + " ' }; };" );
-});
-
-// Send voice call transcript by SMS to me
-// Used by plugin on twiml <Record> elements
-app.post('/send-text-transcript', (req, res) => {
-    // creates and sends a text with transcribed results  
-    client.messages.create({from:'+19783879792',
-			    to: vaughan,
-			    body: req.body.results.text })
-	.then( message => console.log( message.sid ));
-
-    res.writeHead(200, {'Content-Type': 'text/json'});
-    res.end( "{}" );
-});
-
-
-/* ***********************************************
-** Primary App Lighting line 888 200 1601
-**
-** Should provide voicemail, appointment scheduling,
-** and additional features for clients (me, d, whoev)
-** who call in (like listening to voicemail, checking
-** appointments, special dialing features
-**
-** *********************************************** */
-
-
-// App Lighting's primary phone number (888) 200 - 1601
-app.post('/primary-inbound', (req, res) => {
-
+// definition for our primary inbound line(s)
+function primaryInbound(req, res) {
+    console.log( Object.keys(req) );
     const caller = req.body.From;
 
-    var response = undefined;
+    var response = null;
     if ( isClient(caller) ) {
 	// response = clientResponse( caller );
 	// while implementing regularResponse.. all callers are routed
@@ -197,16 +197,18 @@ app.post('/primary-inbound', (req, res) => {
     } else {
 	response = regularResponse();
     }
-
-    if ( response === undefined ) {
+    
+    if ( typeof(response) == 'undefined' ) {
 	throw new Error("'null' when 'Response' type expected");
     }
-
+    
     res.writeHead(200, {'Content-Type': 'text/xml'});
     res.end(response.toString());
-});
+}
 
-
+// App Lighting's primary phone number (888) 200 - 1601
+app.post('/primary-inbound', primaryInbound);
+app.post('/demo-voice', primaryInbound);
 
 // branch for regular callers on App Lighting's
 // primary phone number (888) 200 - 1601
@@ -214,6 +216,11 @@ app.post('/primary-choice', (req, res) => {
     var speech =  req.body.SpeechResult;
     var digits =  req.body.Digits;
 
+    if ( DEBUG ) {
+	console.log( "/primary-choice :: Speech results: " + speech );
+	console.log( "/primary-choice :: digits: " +  digits );
+    }
+    
     const response = new VoiceResponse();
     
     if ( typeof(speech) != 'undefined' ) {
@@ -224,7 +231,7 @@ app.post('/primary-choice', (req, res) => {
 	else
 	    digits = -1; // value to repeat input
     } else if ( typeof(digits) != 'undefined' ) {
-	switch ( digits.parseInt() ) {
+	switch ( typeof(digits) == 'number' ? digits : digits.parseInt() ) {
 	case 1:
 	    response.say('Not yet implemented. Goodbye');
 	    break;
@@ -251,7 +258,7 @@ app.post('/primary-choice', (req, res) => {
     
 });
 
-if ( process.env.NODE_DEBUG ) {
+if ( DEBUG ) {
     app.listen( 9080, () => {
 	console.log('Listening on 127.0.0.1:9080');
     });
